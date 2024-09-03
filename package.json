@@ -1,0 +1,14 @@
+{
+  "name": "esphome_ntchrono",
+  "version": "1.0.0",
+  "description": "Night Table Chrono - Smart Alarm and Clock for my night table",
+  "main": "src/generate_glyps.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "@dianlight",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "svgtofont": "^6.0.0"
+  }
+}
