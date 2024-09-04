@@ -1,18 +1,22 @@
 import svgtofont from 'svgtofont';
+import { createTTF } from 'svgtofont/lib/utils';
 import path from 'node:path';
 
+
 svgtofont({
-  src: path.resolve(process.cwd(), "src/icon"), // svg path
+  src: path.resolve(process.cwd(), "src/svg"), // svg path
   dist: path.resolve(process.cwd(), "dist/fonts"), // output path
   //styleTemplates: path.resolve(rootPath, "styles"), // file templates path (optional)
-  fontName: "svgtofont", // font name
+  fontName: "ntch_icons", // font name
   css: false, // Create CSS files.
-  startUnicode: 0x0016, // unicode start number
+  startUnicode: 0x10, // unicode start number 
   svgicons2svgfont: {
     fontHeight: 1000,
-    normalize: true
+    normalize: true,
+    usePathBounds: true,
+    fixedWidth: true,
   },
-  website:null, // no demo html files
+//  website:null, // no demo html files
 /*   website: {
     title: "svgtofont",
     // Must be a .svg format image.
