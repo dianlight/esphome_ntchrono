@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "font_x": "svgtofont --sources ./src/icon --output ./dist/font --fontName glyps-font --startUnicode 0x16",
-    "font": "npm run clean && node src/generate_glyps.mjs",
+    "font": "npm run clean && npm run build && node dist/main.js",
     "build": "tsc",
     "watch": "tsc -w",
     "dev": "tsc-watch --onSuccess \"node .\"",

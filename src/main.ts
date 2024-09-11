@@ -3,12 +3,18 @@ import {
 	importDirectory,
 	cleanupSVG,
 	runSVGO,
+	deOptimisePaths,
+	scaleSVG,
+	resetSVGOrigin,
+	removeFigmaClipPathFromSVG,
+	convertSVGToMask,
 } from '@iconify/tools';
 import fs from "node:fs/promises";
 import svgtofont from 'svgtofont';
 import { createTTF } from 'svgtofont/lib/utils';
 import path from "node:path"
 
+const start_char=33;
 
 (async () => {
 	// Import icons
@@ -17,15 +23,18 @@ import path from "node:path"
 	});
 
 	// Validate, clean up, fix palette and optimise
+	let character = start_char;
 	iconSet.forEach((name, type) => {
 		if (type !== 'icon') {
-			return;
+			console.log(`${name} type: ${type}`);
+//			return;
 		}
 
 		const svg = iconSet.toSVG(name);
 		if (!svg) {
 			// Invalid icon
 			iconSet.remove(name);
+			console.log(`${name} invalid`);
 			return;
 		}
 
@@ -34,7 +43,15 @@ import path from "node:path"
 			// Clean up icon code
 			cleanupSVG(svg);
 			// Optimise
-			runSVGO(svg);
+			runSVGO(svg,{
+				keepShapes: true,
+			});
+			deOptimisePaths(svg);
+			resetSVGOrigin(svg);
+			console.log(`SVG ${name} ${svg.viewBox.width}x${svg.viewBox.height} -> 48x48`);
+			scaleSVG(svg,48/svg.viewBox.width);
+			removeFigmaClipPathFromSVG(svg);
+			//
 		} catch (err) {
 			// Invalid icon
 			console.error(`Error parsing ${name}:`, err);
@@ -44,7 +61,10 @@ import path from "node:path"
 
 		// Update icon
 		iconSet.fromSVG(name, svg);
+		iconSet.toggleCharacter(name,String.fromCharCode(character++),true);
 	});
+
+	console.log(`Exported ${character-33} chars in map!`);
 
 
     // Export as IconifyJSON
@@ -59,12 +79,18 @@ import path from "node:path"
 
    await exportToDirectory(iconSet, {
     target: `dist/fonts/${iconSet.prefix}`,
-    log: true,
+	cleanup: true,
+	autoHeight: false,
+	includeAliases: true,
+	includeChars: false,
+    log: false,
     });
+
 
 	// Generated Iconset
 	//console.log(iconSet.export());
    // TTF Generation
+
 
 
 
@@ -74,9 +100,13 @@ import path from "node:path"
     //styleTemplates: path.resolve(rootPath, "styles"), // file templates path (optional)
     fontName: iconSet.prefix, // font name
     css: false, // Create CSS files.
-    startUnicode: 0x10, // unicode start number 
+    startUnicode: start_char, // unicode start number 
     svgicons2svgfont: {
-      fontHeight: 1000,
+	  centerHorizontally: true,
+	  centerVertically: true,
+      fontHeight: 48,
+	  descent: 20,
+	  ascent: 48-10,
       normalize: true,
       usePathBounds: true,
       fixedWidth: true,
